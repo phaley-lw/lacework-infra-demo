@@ -67,8 +67,8 @@ data "aws_iam_policy_document" "allow_public_read" {
     ]
 
     resources = [
-      aws_s3_bucket.arn,
-      "${aws_s3_bucket.arn}/*",
+      aws_s3_bucket.ph.arn,
+      "${aws_s3_bucket.ph.arn}/*",
     ]
   }
 }
