@@ -21,7 +21,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "ph" {
-     bucket = "pth-website-demo"
+     bucket = var.bucket_name
 }
 
 resource "aws_s3_bucket_website_configuration" "ph-config" {
@@ -51,21 +51,24 @@ resource "aws_s3_bucket_public_access_block" "example" {
 
 resource "aws_s3_bucket_policy" "ph-policy" {
   bucket = aws_s3_bucket.ph.id
-  policy = <<EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "PublicReadGetObject",
-        "Effect": "Allow",
-        "Principal": "*",
-        "Action": "s3:GetObject",
-        "Resource": "arn:aws:s3:::pth-website-demo/*"
-      }
+  policy = data.aws_iam_policy_document.allow_public_read.json
+  depends_on = [aws_s3_bucket_public_access_block.example]
+}
+
+data "aws_iam_policy_document" "allow_public_read" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "s3:GetObject"
+    ]
+
+    resources = [
+      aws_s3_bucket.ph.arn,
+      "${aws_s3_bucket.ph.arn}/*",
     ]
   }
-
-  EOF
-
-  depends_on = [aws_s3_bucket_public_access_block.example]
 }
