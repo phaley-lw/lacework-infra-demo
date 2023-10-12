@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "allow_public_read" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = "*"
+      identifiers = ["*"]
     }
 
     actions = [
