@@ -49,12 +49,6 @@ resource "aws_s3_bucket_public_access_block" "example" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_policy" "ph-policy" {
-  bucket = aws_s3_bucket.ph.id
-  policy = data.aws_iam_policy_document.allow_public_read.json
-  depends_on = [aws_s3_bucket_public_access_block.example]
-}
-
 data "aws_iam_policy_document" "allow_public_read" {
   statement {
     principals {
@@ -71,4 +65,10 @@ data "aws_iam_policy_document" "allow_public_read" {
       "${aws_s3_bucket.ph.arn}/*",
     ]
   }
+}
+
+resource "aws_s3_bucket_policy" "ph-policy" {
+  bucket = aws_s3_bucket.ph.id
+  policy = data.aws_iam_policy_document.allow_public_read.json
+  depends_on = [aws_s3_bucket_public_access_block.example]
 }
