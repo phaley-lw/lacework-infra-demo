@@ -66,20 +66,20 @@ resource "aws_s3_bucket_policy" "ph-policy" {
   depends_on = [aws_s3_bucket_public_access_block.example]
 }
 
-resource "aws_s3_bucket" "ph_2" {
+resource "aws_s3_bucket" "ph-2" {
      bucket = var.bucket_name_2
 }
 
 resource "aws_s3_bucket_website_configuration" "ph-config-2" {
-  bucket = aws_s3_bucket.ph_2.bucket
+  bucket = aws_s3_bucket.ph-2.bucket
   
   index_document {
     suffix = "index.html"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "example_2" {
-  bucket = aws_s3_bucket.ph_2.id
+resource "aws_s3_bucket_public_access_block" "example-2" {
+  bucket = aws_s3_bucket.ph-2.id
 
   block_public_acls       = false
   block_public_policy     = false
@@ -87,15 +87,15 @@ resource "aws_s3_bucket_public_access_block" "example_2" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
-  bucket = aws_s3_bucket.ph_2.id
+resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership-2" {
+  bucket = aws_s3_bucket.ph-2.id
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
-  depends_on = [aws_s3_bucket_public_access_block.example_2]
+  depends_on = [aws_s3_bucket_public_access_block.example-2]
 }
 
-data "aws_iam_policy_document" "allow_public_read_2" {
+data "aws_iam_policy_document" "allow_public_read-2" {
   statement {
     principals {
       type        = "AWS"
@@ -107,8 +107,14 @@ data "aws_iam_policy_document" "allow_public_read_2" {
     ]
 
     resources = [
-      aws_s3_bucket.ph_2.arn,
-      "${aws_s3_bucket.ph_2.arn}/*",
+      aws_s3_bucket.ph-2.arn,
+      "${aws_s3_bucket.ph-2.arn}/*",
     ]
   }
+}
+
+resource "aws_s3_bucket_policy" "ph-policy-2" {
+  bucket = aws_s3_bucket.ph-2.id
+  policy = data.aws_iam_policy_document.allow_public_read-2.json
+  depends_on = [aws_s3_bucket_public_access_block.example-2]
 }
